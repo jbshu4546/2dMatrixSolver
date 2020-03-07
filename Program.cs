@@ -70,6 +70,12 @@ namespace _2dMatrixSolver
             });
             arraysToSolve.Add(new int[,]
             {
+                { 0, 0, 1 },
+                { 0, 0, 1 },
+                { 0, 1, 0 }
+            });
+            arraysToSolve.Add(new int[,]
+            {
                 { 0, 0, 0, 0 },
                 { 1, 1, 0, 0 },
                 { 0, 0, 0, 0 },
@@ -130,30 +136,10 @@ namespace _2dMatrixSolver
                     var diagCoord = getLongestDiag(array, cCoord);
 
                     //found a diagonal of len > 0
-                    if (!EqualCoords(cCoord, diagCoord))
+                    while (diagCoord.Row > cCoord.Row && diagCoord.Col > cCoord.Row)
                     {
                         //assume we have a square contained in the bounds of the diagonal we just computed until proven otherwise
-                        bool haveASquare = true;
-                        
-                        //start at the SouthEast corner of our potential square (i.e. position indicated by the computed diagonal),
-                        //sweep back to cCoord (from SouthEast to NorthWest)
-                        for (int r = diagCoord.Row; r >= cCoord.Row; r--)
-                        {
-                            for (int c = diagCoord.Col; c >= cCoord.Col; c--)
-                            {
-                                elementsChecked++;
-                                //Make sure every value in potential square is equal
-                                if (array[r,c] != cVal)
-                                {
-                                    //values aren't equal! This is NOT a potential solution so stop the loop.
-                                    haveASquare = false;
-                                    break;
-                                }
-                            }
-                            //stop the loop if we don't have a potential solution
-                            if (!haveASquare)
-                                break;
-                        }
+                        bool haveASquare = CheckCurrentSquare(array, cCoord, diagCoord, cVal);
 
                         //we checked every value in the potential square and they are all equal
                         if (haveASquare)
@@ -166,6 +152,14 @@ namespace _2dMatrixSolver
                                 largestSquareLength = cSquareLen;
                                 largetSquareOrigin = cCoord;
                             }
+
+                            break;
+                        }
+                        else
+                        {
+                            //we may still have a valid square along this diaglonal, but the current diagonal may be too long
+                            diagCoord.Row--;
+                            diagCoord.Col--;
                         }
                     }
                 }
@@ -175,15 +169,42 @@ namespace _2dMatrixSolver
         }
 
         /// <summary>
-        /// Check if two coordinates are equal
+        /// checks all values in a square bounded the the NW (cCoord) and SE (diagCoord) corners
         /// </summary>
-        /// <param name="c1"></param>
-        /// <param name="c2"></param>
-        /// <returns>true if the coordinates refer to the same position, false otherwise</returns>
-        static bool EqualCoords(Coord c1, Coord c2)
+        /// <param name="array"></param>
+        /// <param name="cCoord">NW corner</param>
+        /// <param name="diagCoord">SE corner</param>
+        /// <param name="cVal">value to compare against</param>
+        /// <returns>true if all values in the square equal cVal, false otherwise</returns>
+        private static bool CheckCurrentSquare(int[,] array, Coord cCoord, Coord diagCoord, int cVal)
         {
-            return (c1?.Row == c2?.Row && c1?.Col == c2?.Col);
+            bool haveASquare = true;
+            //start at the SouthEast corner of our potential square (i.e. position indicated by the computed diagonal),
+            //sweep back to cCoord (from SouthEast to NorthWest)
+            for (int r = diagCoord.Row; r >= cCoord.Row; r--)
+            {
+                for (int c = diagCoord.Col; c >= cCoord.Col; c--)
+                {
+                    elementsChecked++;
+                    //Make sure every value in potential square is equal
+                    if (array[r, c] != cVal)
+                    {
+                        //values aren't equal! This is NOT a potential solution so stop the loop.
+                        haveASquare = false;
+                        break;
+                    }
+                }
+
+                //stop the loop because we dont have a valid square
+                if (!haveASquare)
+                {
+                    break;
+                }
+            }
+
+            return haveASquare;
         }
+
 
         /// <summary>
         /// iterate from given point NW to SE, stopping when value at current position is not equal to value at given position
