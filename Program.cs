@@ -43,8 +43,65 @@ namespace _2dMatrixSolver
                 Console.WriteLine("");
             }
 
+            try
+            {
+                int argRowsToSolve = -1;
+                int argColsToSolve = -1;
+                argRowsToSolve = int.Parse(args[0]);
+                argColsToSolve = int.Parse(args[1]);
+                int[,] generatedArray = GeneratedArray(argRowsToSolve, argColsToSolve);
+
+                Console.WriteLine("CUSTOM ARRAY REQUEST DETECTED");
+                //print array to solve 
+                Console.WriteLine("Randomly generated array to solve:");
+                Console.WriteLine(PrintArray(generatedArray));
+
+                //solve the array and time it
+                var watch = System.Diagnostics.Stopwatch.StartNew();
+                (Coord, int) ret = Solve(generatedArray);
+                watch.Stop();
+
+                var elapsedMs = watch.ElapsedMilliseconds;
+                runTimes.Add(elapsedMs);
+
+                Console.WriteLine("Largest Square Coord: " + ret.Item1.Row + ", " + ret.Item1.Col);
+                Console.WriteLine("Largest Square Length: " + ret.Item2);
+                Console.WriteLine("Took: " + elapsedMs + "ms");
+                Console.WriteLine("Elements in array: " + generatedArray.Length);
+                Console.WriteLine("Elements checked: " + elementsChecked);
+                elementsChecked = 0;
+
+                Console.WriteLine("");
+                Console.WriteLine("<--------->");
+                Console.WriteLine("");
+            }
+            catch
+            {
+                Console.WriteLine("No valid args detected");
+            }
             //print average time it took to solve the arrays
             Console.WriteLine("AVERAGE SOLVE TIME: " + runTimes.Average() + "ms");
+        }
+
+        /// <summary>
+        /// randomly generates an array of the given dimensions
+        /// </summary>
+        /// <param name="argRowsToSolve"></param>
+        /// <param name="argColsToSolve"></param>
+        /// <returns></returns>
+        private static int[,] GeneratedArray(int argRowsToSolve, int argColsToSolve)
+        {
+            int[,] ret = new int[argRowsToSolve, argColsToSolve];
+            Random rand = new Random();
+            for (int i = 0; i < argRowsToSolve; i++)
+            {
+                for (int j = 0; j < argColsToSolve; j++)
+                {
+                    ret[i, j] = rand.Next(0, 2);
+                }
+            }
+
+            return ret;
         }
 
         /// <summary>
@@ -244,7 +301,7 @@ namespace _2dMatrixSolver
                         {
                             break;
                         }
-                    } 
+                    }
                     //stop the loop when we go out of bounds
                     else
                     {
