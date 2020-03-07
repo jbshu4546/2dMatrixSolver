@@ -193,7 +193,7 @@ namespace _2dMatrixSolver
                     var diagCoord = getLongestDiag(array, cCoord);
 
                     //found a diagonal of len > 0
-                    while (diagCoord.Row > cCoord.Row && diagCoord.Col > cCoord.Row)
+                    while (diagCoord.Row > cCoord.Row || diagCoord.Col > cCoord.Row)
                     {
                         //assume we have a square contained in the bounds of the diagonal we just computed until proven otherwise
                         bool haveASquare = CheckCurrentSquare(array, cCoord, diagCoord, cVal);

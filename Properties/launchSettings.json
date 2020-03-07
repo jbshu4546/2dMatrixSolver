@@ -2,7 +2,7 @@
   "profiles": {
     "2dMatrixSolver": {
       "commandName": "Project",
-      "commandLineArgs": "5 10"
+      "commandLineArgs": "10 2"
     }
   }
 }
